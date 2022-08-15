@@ -1,21 +1,23 @@
                                             <!-- Map child component -->
 <!-- --------------------------------------------------------------------------------------------------------------------- -->
-<script setup>
+<script setup lang="ts">
     //imports
     import { onMounted, watch } from 'vue'
-    
-    //variables
-    // empty array to hold all markers
-    var markersArr = []
-    var map
+    import type { PropType } from 'vue'
+    import type { Camp } from '../assets/camps'
+
+    import L from 'leaflet'
+    import 'leaflet/dist/leaflet.css'
+
+    import Geocoder from 'leaflet-control-geocoder';
 
     //props
     /* create an object called props to define all 
     the props in use */
     const props = defineProps ({
         //define the prop name and type here
-        camps: Array,
-        activeCamp: Number
+        camps: Array as PropType<Camp[]>,
+        activeCamp: Number as PropType<number | null>
     })
 
     //custom markers
@@ -39,6 +41,11 @@
         iconUrl: 'src/assets/icons/location-pin.svg',
         iconSize: [30, 30],
     });
+
+    //variables
+    // empty array to hold all markers
+    var markersArr: L.Marker[] = []
+    let map: L.Map | L.LayerGroup<any> 
 
     //events
     /* define an emit object called emit and
@@ -67,7 +74,8 @@
         //add OpenStreet as the default layer
         layers.OpenStreet.addTo(map)
         // geocoder
-        L.Control.geocoder().addTo(map)
+        const GeocoderControl = new Geocoder();
+        GeocoderControl.addTo(map);
 
         if (!navigator.geolocation){
             console.log("Fuck off")
@@ -75,27 +83,31 @@
             navigator.geolocation.getCurrentPosition(getUserLocation)
         }
 
-
-
         // loop through the campsArr 
-        props.camps.forEach(camp => {
-            /* and create a marker for each camp site using the coordinates
-            from camps.js and add markers to our map.
-            additionally, add the camp name onto the pop up */
-            const marker = L.marker([camp.y, camp.x], {icon: locationPin}).addTo(map)
-                .bindPopup(camp.name)
-            // .openPopup();
+        // if(typeof props.camps !== undefined ){
+            
+        // }
+        if (typeof props.camps !== 'undefined'){
+            props.camps.forEach((camp: Camp) => {
+                /* and create a marker for each camp site using the coordinates
+                from camps.js and add markers to our map.
+                additionally, add the camp name onto the pop up */
+                const marker : any = L.marker([camp.y, camp.x], {icon: locationPin})
+                marker.addTo(map)
+                marker.bindPopup(camp.name)
+                // .openPopup();
 
-            //adding a new property named campId to the object marker
-            marker.campId = camp.id
-            marker.on('click', () =>{
-                emit('ClickMarker', camp.id )
+                //adding a new property named campId to the object marker
+                marker.campId = camp.id
+                marker.on('click', () =>{
+                    emit('clickMarker', camp.id )
+                })
+                //add above marker to array
+                markersArr.push(marker)
             })
-            //add above marker to array
-            markersArr.push(marker)
-        })
+        }
         //adds the array of markers to the map
-        var markers = new L.featureGroup(markersArr).addTo(map)
+        var markers: L.FeatureGroup = L.featureGroup(markersArr).addTo(map)
         //zooms and focuses into the area that the markers are located
         map.fitBounds(markers.getBounds())
         map.zoomOut(4)
@@ -110,19 +122,24 @@
         /* when a camp site is selected, 
         set marker to the red marker */
         const activeMarker = markersArr.find(marker => marker.campId == props.activeCamp)
+        if (typeof activeMarker === 'undefined') {
+            return
+        }
         activeMarker.openPopup()
         activeMarker.setIcon(redMarker)
     })
     
 
-    function getUserLocation(position){
+    function getUserLocation(position: { coords: { latitude: number; longitude: number; }; }){
 
         var userMarker
 
         const lat = position.coords.latitude
         const long = position.coords.longitude
 
-        userMarker = L.marker([lat, long], {icon: locationPin}).addTo(map).bindPopup('You are here!')
+        userMarker = L.marker([lat, long], {icon: locationPin})
+        userMarker.addTo(map)
+        userMarker.bindPopup('You are here!')
 
     }
 

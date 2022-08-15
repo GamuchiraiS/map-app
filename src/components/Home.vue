@@ -1,11 +1,12 @@
-<script setup>
+<script setup lang="ts">
   // imports
-  import { ref} from 'vue'
+  import { ref, watch} from 'vue'
   import { campsArr } from '../assets/camps'
+  import type { Camp } from '../assets/camps'
   import Map from './Map.vue'
 
-  const camps = ref(campsArr)
-  const activeCamp = ref(null)
+  const camps = ref<Camp[]>(campsArr)
+  const activeCamp = ref<number | null>(null)
 
   
 
@@ -29,7 +30,7 @@
   </div>
   <!------------------------------------------------------- Map child component ---------------------------------------------->
   <!-- pass camps to Map -->
-  <Map :camps="camps" :activeCamp="activeCamp" 
+  <Map :camps="camps" :activeCamp="activeCamp"
     @clickMarker="(id) => {activeCamp = id}"
   />
   <!--- --- ------------------------------------------------------------------------------------------------------------------>

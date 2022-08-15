@@ -1,8 +1,8 @@
 import { createApp } from 'vue'
-import {createRouter, createWebHistory} from 'vue-router'
-import Camps  from './components/Camps.vue';
-import App from './src/App.vue'
-import Home from './src/components/Home.vue'
+import { createRouter, createWebHistory } from 'vue-router'
+import Camps  from './components/Camps.vue'
+import App from './App.vue'
+import Home from './components/Home.vue'
 
 import './assets/main.css'
 
@@ -31,8 +31,7 @@ import './assets/main.css'
   // keep it simple for now.
   const router = createRouter({
     // 4. Provide the history implementation to use. We are using the hash history for simplicity here.
-    
-    history: createWebHistory(),
+    history: createWebHistory(import.meta.env.BASE_URL),
     routes: routes, // short for `routes: routes`
   })
 
