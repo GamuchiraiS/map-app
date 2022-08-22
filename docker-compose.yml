@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  app:
+    image: node:latest
+    # build: .
+    volumes: 
+      - ./:/home/node/app
+    working_dir: /home/node/app
+    restart: always
+    command: 'npm run dev'
+    # ports: 
+    #   - 8080: 80
