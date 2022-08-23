@@ -4,10 +4,13 @@ services:
   app:
     image: node:latest
     # build: .
-    volumes: 
+    volumes:
+          # take this current folder and put it in the folder
+          # why?
+          # because that's why nodejs expects our folder to be in 
       - ./:/home/node/app
     working_dir: /home/node/app
     restart: always
     command: 'npm run dev'
-    # ports: 
-    #   - 8080: 80
+    ports: 
+      - 8081:80
